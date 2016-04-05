@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+
+
+
+{% block content %}
+    <section class="bg-primary" id="about">
+        <div class="container">
+            <div class="row text-center">
+                        <h2 style="border-bottom:1px solid #FFF;">Awarded Badges...</h2>
+                <div class="awardGrid">
+                    {% if awarded %}
+                        {% for award in awarded %}
+                                <div class="badgeContainer col-sm-2">
+                                    <a href="{{ award.badge.get_absolute_url }}">
+                                        <div class="badgeHolder">
+                                            <img src="{{ award.badge.image }}" alt="{{ award.badge.title }}">
+                                            <h3>{{ award.badge.title }}</h3>
+                                            <p>{{ award.badge.categories.all.0.title }}</p>
+                                        </div>
+                                    </a>
+                                </div>
+                        {% endfor %}
+                    {% else %}
+                        <h4 class="section-heading">Sorry, you have no shorted urls yet.</h4>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row text-center">
+                        <h2 style="border-bottom:1px solid #FFF;">Badges I Want...</h2>
+                <div class="wantedGrid">
+                    {% if wanted %}
+                        {% for want in wanted %}
+                                <div class="badgeContainer col-sm-2">
+                                    <a href="{{ want.badge.get_absolute_url }}">
+                                        <div class="badgeHolder">
+                                            <img src="{{ want.badge.image }}" alt="{{ want.badge.title }}">
+                                            <h3>{{ want.badge.title }}</h3>
+                                            <p>{{ want.badge.categories.all.0.title }}</p>
+                                        </div>
+                                    </a>
+                                </div>
+                        {% endfor %}
+                    {% else %}
+                        <h4 class="section-heading">Sorry, you have no shorted urls yet.</h4>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+
+{% block extraScript %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            var awarded = $('.awardGrid').masonry({
+                // options
+                itemSelector: '.badgeContainer',
+                columnWidth: 195,
+            });
+            var wanted = $('.wantedGrid').masonry({
+                // options
+                itemSelector: '.badgeContainer',
+                columnWidth: 195,
+            });
+
+            awarded.imagesLoaded().progress( function() {
+              awarded.masonry('layout');
+            });
+            wanted.imagesLoaded().progress( function() {
+              wanted.masonry('layout');
+            });
+
+        });
+    </script>
+{% endblock extraScript %}

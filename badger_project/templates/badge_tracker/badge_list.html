@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+
+
+
+{% block content %}
+    <section class="bg-primary" id="about">
+        <div class="container">
+            <div class="row">
+                <div class="text-center">
+                    <div class="btn-toolbar">
+                        <div class="btn-group">
+                            <select id="categorySelector" class="form-control">
+                                {% for category in categories %}
+                                <option value="{{ category.slug }}">{{ category.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="btn-group">
+                            <select id="subjectSelector" class="form-control">
+                                {% for subject in subjects %}
+                                <option value="{{ subject.slug }}">{{ subject.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="btn-group">
+                            <select id="platformSelector" class="form-control">
+                                {% for platform in platforms %}
+                                <option value="{{ platform.slug }}">{{ platform.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center grid">
+                {% if object_list %}
+                            {% for badge in object_list %}
+                                <div class="badgeContainer col-sm-2
+                                {% for category in badge.categories.all %}
+                                    {{ category.slug }}
+                                {% endfor %}
+                                {% for platform in badge.platforms.all %}
+                                    {{ platform.slug }}
+                                {% endfor %}
+                                {% for subject in badge.subjects.all %}
+                                    {{ subject.slug }}
+                                {% endfor %}
+                                ">
+                                    <a href="{{ badge.get_absolute_url }}">
+                                        <div class="badgeHolder">
+                                            <img src="{{ badge.image }}" alt="{{ badge.title }}">
+                                            <h3>{{ badge.title }}</h3>
+                                            <p>{{ badge.categories.all.0.title }}</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                {% else %}
+                    <p>Sorry, we couldn't find any badges that match your search.</p>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+
+
+
+{% block extraScript %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            var $grid = $('.grid').masonry({
+                    // options
+                    itemSelector: '.badgeContainer',
+                    columnWidth: 195,
+            });
+
+            // layout Masonry after each image loads
+            $grid.imagesLoaded().progress( function() {
+              $grid.masonry('layout');
+            });
+
+            $("select").on('change',function(){
+                badgeSort();
+            });
+
+
+            var badgeSort = function(){
+                // The classes need to match all 3 criteria in order for the badge to be visible.
+                // Step 1: get the 3 criteria
+                var selectorClasses = "";
+                var category = $("#categorySelector").val();
+                var subject = $("#subjectSelector").val();
+                var platform = $("#platformSelector").val();
+                console.log("category: "+category);
+                console.log("subject: "+subject);
+                console.log("platform: "+platform);
+
+                //Concat all classes that are not all
+                if (category!='all-categories'){
+                    selectorClasses += "."+category;
+                }
+                if (subject!='all-subjects'){
+                    selectorClasses += "."+subject;
+                }
+                if (platform!='all-platforms'){
+                    selectorClasses += "."+platform;
+                }
+                console.log("selectorClasses: "+selectorClasses);
+
+                //Check the the selectorClass variable is not blank
+                if (selectorClasses!="") {
+                    //set all badges to hidden first then unhide the ones selected
+                    $('.badgeContainer').fadeOut(300);
+                    //Get all badges with those classes and set them to visible
+                    $(selectorClasses).each(function(){
+                        $(this).fadeIn(300, function(){
+                            $grid.masonry();
+                        });
+                    });
+                }else{
+                    $('.badgeContainer').fadeIn(300, function(){
+                        $grid.masonry();
+                    });
+                }
+
+            }
+
+
+        });
+    </script>
+{% endblock extraScript %}

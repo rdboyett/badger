@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+
+
+
+{% block content %}
+    <section class="bg-primary" id="about">
+        <div class="container">
+            <div class="row">
+                <div class="text-center grid">
+                {% if badges %}
+                    {% if badges.count > 0 %}
+                            {% for badge in badges %}
+                                <div class="badgeContainer col-sm-2">
+                                    <a href="{{ badge.get_absolute_url }}">
+                                        <div class="badgeHolder">
+                                            <img src="{{ badge.image }}" alt="{{ badge.title }}">
+                                            <h3>{{ badge.title }}</h3>
+                                            <p>{{ badge.categories.all.0.title }}</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                    {% else %}
+                    <p>Sorry, we couldn't find any badges that match your search.</p>
+                    {% endif %}
+
+                {% else %}
+                    <p>Sorry, we couldn't find any badges that match your search.</p>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+
+
+
+{% block extraScript %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/3.3.2/masonry.pkgd.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            var $grid = $('.grid').masonry({
+                // options
+                itemSelector: '.badgeContainer',
+            });
+
+            // layout Masonry after each image loads
+            $grid.imagesLoaded().progress( function() {
+              $grid.masonry('layout');
+            });
+        });
+    </script>
+{% endblock extraScript %}
